@@ -1,5 +1,7 @@
 ﻿using Korvan_API.Entities;
 using Korvan_API.Models.DTOs;
+using Korvan_API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -8,63 +10,57 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Korvan_API.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class AuthController(IConfiguration configuration) : ControllerBase
+	public class AuthController(IAuthService authService) : ControllerBase
 	{
 		public static User user = new();
 
 		[HttpPost("register")]
-		public ActionResult<User> Register(UserDTO request) {
-			var hashedPassword = new PasswordHasher<User>()
-				.HashPassword(user, request.Password);
-
-			user.Username = request.Username;
-			user.PasswordHash = hashedPassword;
+		public async Task<ActionResult<User>> Register(UserDTO request) {
+			var user = await authService.RegisterAsync(request);
+			if (user is null) 
+				return BadRequest("Username already exists.");
 
 			return Ok(user);
 		}
 
 		[HttpPost("login")]
-		public ActionResult<string> Login(UserDTO request)
+		public async Task<ActionResult<TokenResponseDTO>> Login(UserDTO request)
 		{
-			if (user.Username != request.Username) {
-				return BadRequest("User not found!");
-			}
+			var result = await authService.LoginAsync(request);
+			if (result is null)
+				return BadRequest("Invalid username or password.");
 
-			if (new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, request.Password) == PasswordVerificationResult.Failed) {
-				return BadRequest("Wrong password.");
-			}
-
-			string token = CreateToken(user);
-
-			return Ok(token);
+			return Ok(result);
 		}
 
-		private string CreateToken(User user)
+		[HttpPost("refresh-token")]
+		public async Task<ActionResult<TokenResponseDTO>> RefreshToken(RefreshTokenRequestDTO request)
 		{
-			var claims = new List<Claim>
-			{
-				new Claim(ClaimTypes.Name, user.Username)
-			};
+			var result = await authService.RefreshTokenAsync(request);
+			if (result is null || result.AccessToken is null || result.RefreshToken is null)
+				return Unauthorized("Invalid refresh token.");
+			
+			return Ok(result);
+		}
 
-			var key = new SymmetricSecurityKey(
-				Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSettings:Token")!));
+		[Authorize]
+		[HttpGet]
+		public IActionResult AuthenticatedOnlyEndpoint()
+		{
+			return Ok("You are authenticated!");
+		}
 
-			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
-
-			var tokenDescriptor = new JwtSecurityToken(
-				issuer: configuration.GetValue<string>("AppSettings:Issuer"),
-				audience: configuration.GetValue<string>("AppSettings:Audience"),
-				claims: claims,
-				expires: DateTime.UtcNow.AddDays(1),
-				signingCredentials: creds
-			);
-
-			return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+		[Authorize(Roles = "Admin")]
+		[HttpGet("admin-only")]
+		public IActionResult AdminOnlyEndpoint()
+		{
+			return Ok("You are admin!");
 		}
 	}
 }

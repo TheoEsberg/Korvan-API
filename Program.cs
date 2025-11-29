@@ -1,7 +1,34 @@
+using Korvan_API.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// 1. Register DbContext with Npgsql provider
+builder.Services.AddDbContext<Korvan_API.Data.UserDbContext>(options => 
+	options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+	.AddJwtBearer(options =>
+	{
+		options.TokenValidationParameters = new TokenValidationParameters
+		{
+			ValidateIssuer = true,
+			ValidIssuer = builder.Configuration["AppSettings:Issuer"],
+			ValidateAudience = true,
+			ValidAudience = builder.Configuration["AppSettings:Audience"],
+			ValidateLifetime = true,
+			IssuerSigningKey = new SymmetricSecurityKey(
+				Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]!)),
+			ValidateIssuerSigningKey = true
+		};
+	});
+
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Add services to the container.
 
