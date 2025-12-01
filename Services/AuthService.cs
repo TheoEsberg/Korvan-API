@@ -12,7 +12,7 @@ using System.Text;
 
 namespace Korvan_API.Services
 {
-	public class AuthService(UserDbContext context, IConfiguration configuration) : IAuthService
+	public class AuthService(AppDbContext context, IConfiguration configuration) : IAuthService
 	{
 		public async Task<TokenResponseDTO?> LoginAsync(UserDTO request)
 		{
@@ -71,7 +71,7 @@ namespace Korvan_API.Services
 		private async Task<User?> ValidateRefreshTokenAsync(Guid userId, string refreshToken)
 		{
 			var user = await context.Users.FindAsync(userId);
-			if (user is null || refreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+			if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
 			{
 				return null;
 			}
@@ -103,7 +103,7 @@ namespace Korvan_API.Services
 				new Claim(ClaimTypes.Name, user.Username),
 				new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
 				new Claim(ClaimTypes.Role, user.Role)
-			};
+            };
 
 			var key = new SymmetricSecurityKey(
 				Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSettings:Token")!));

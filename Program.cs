@@ -9,7 +9,7 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. Register DbContext with Npgsql provider
-builder.Services.AddDbContext<Korvan_API.Data.UserDbContext>(options => 
+builder.Services.AddDbContext<Korvan_API.Data.AppDbContext>(options => 
 	options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -46,7 +46,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

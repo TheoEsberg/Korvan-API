@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Korvan_API.Migrations
 {
-    [DbContext(typeof(UserDbContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20251129134348_init")]
     partial class init
     {
