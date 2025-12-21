@@ -50,7 +50,9 @@ namespace Korvan_API.Controllers
                     Status = s.Status,
                     EmployeeId = s.EmployeeId,
                     EmployeeName = s.Employee != null ? s.Employee.DisplayName : null,
-                    CreatedById = s.CreatedById,
+					EmployeeColorHex = s.Employee != null ? s.Employee.ProfileColorHex : null,
+					EmployeeAvatarUrl = s.Employee != null ? s.Employee.AvatarUrl : null,
+					CreatedById = s.CreatedById,
                     CreatedAt = s.CreatedAt,
                     UpdatedById = s.UpdatedById,
                     UpdatedAt = s.UpdatedAt
@@ -92,7 +94,9 @@ namespace Korvan_API.Controllers
                     Status = s.Status,
                     EmployeeId = s.EmployeeId,
                     EmployeeName = s.Employee != null ? s.Employee.DisplayName : null,
-                    CreatedById = s.CreatedById,
+					EmployeeColorHex = s.Employee != null ? s.Employee.ProfileColorHex : null,
+					EmployeeAvatarUrl = s.Employee != null ? s.Employee.AvatarUrl : null,
+					CreatedById = s.CreatedById,
                     CreatedAt = s.CreatedAt,
                     UpdatedById = s.UpdatedById,
                     UpdatedAt = s.UpdatedAt
@@ -129,7 +133,9 @@ namespace Korvan_API.Controllers
                 Status = shift.Status,
                 EmployeeId = shift.EmployeeId,
                 EmployeeName = shift.Employee != null ? shift.Employee.DisplayName : null,
-                CreatedById = shift.CreatedById,
+				EmployeeColorHex = shift.Employee != null ? shift.Employee.ProfileColorHex : null,
+				EmployeeAvatarUrl = shift.Employee != null ? shift.Employee.AvatarUrl : null,
+				CreatedById = shift.CreatedById,
                 CreatedAt = shift.CreatedAt,
                 UpdatedById = shift.UpdatedById,
                 UpdatedAt = shift.UpdatedAt
@@ -173,7 +179,9 @@ namespace Korvan_API.Controllers
                 Status = shift.Status,
                 EmployeeId = shift.EmployeeId,
                 EmployeeName = shift.Employee?.DisplayName,
-                CreatedById = shift.CreatedById,
+				EmployeeColorHex = shift.Employee != null ? shift.Employee.ProfileColorHex : null,
+				EmployeeAvatarUrl = shift.Employee != null ? shift.Employee.AvatarUrl : null,
+				CreatedById = shift.CreatedById,
                 CreatedAt = shift.CreatedAt
             };
 

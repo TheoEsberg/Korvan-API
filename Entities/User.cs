@@ -13,6 +13,9 @@
         public string? RefreshToken { get; set; }
 		public DateTime? RefreshTokenExpiryTime { get; set; }
 
+		public string? ProfileColorHex { get; set; } // Profile color as hex
+		public string? AvatarUrl { get; set; } // Profilepicture currently only URL based
+
 		public ICollection<WorkShift> AssignedShifts { get; set; } = new List<WorkShift>();
     }
 }
