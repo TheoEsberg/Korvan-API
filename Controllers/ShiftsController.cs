@@ -51,7 +51,10 @@ namespace Korvan_API.Controllers
                     EmployeeId = s.EmployeeId,
                     EmployeeName = s.Employee != null ? s.Employee.DisplayName : null,
 					EmployeeColorHex = s.Employee != null ? s.Employee.ProfileColorHex : null,
-					EmployeeAvatarUrl = s.Employee != null ? s.Employee.AvatarUrl : null,
+					EmployeeHasAvatar = s.Employee != null && s.Employee.AvatarImage != null && s.Employee.AvatarImage.Length > 0,
+
+					// Option B: return endpoint path, NOT a stored url
+					EmployeeAvatarUrl = s.EmployeeId != null ? $"/api/users/{s.EmployeeId}/avatar" : null,
 					CreatedById = s.CreatedById,
                     CreatedAt = s.CreatedAt,
                     UpdatedById = s.UpdatedById,
@@ -95,7 +98,10 @@ namespace Korvan_API.Controllers
                     EmployeeId = s.EmployeeId,
                     EmployeeName = s.Employee != null ? s.Employee.DisplayName : null,
 					EmployeeColorHex = s.Employee != null ? s.Employee.ProfileColorHex : null,
-					EmployeeAvatarUrl = s.Employee != null ? s.Employee.AvatarUrl : null,
+					EmployeeHasAvatar = s.Employee != null && s.Employee.AvatarImage != null && s.Employee.AvatarImage.Length > 0,
+
+					// Option B: return endpoint path, NOT a stored url
+					EmployeeAvatarUrl = s.EmployeeId != null ? $"/api/users/{s.EmployeeId}/avatar" : null,
 					CreatedById = s.CreatedById,
                     CreatedAt = s.CreatedAt,
                     UpdatedById = s.UpdatedById,
@@ -134,7 +140,10 @@ namespace Korvan_API.Controllers
                 EmployeeId = shift.EmployeeId,
                 EmployeeName = shift.Employee != null ? shift.Employee.DisplayName : null,
 				EmployeeColorHex = shift.Employee != null ? shift.Employee.ProfileColorHex : null,
-				EmployeeAvatarUrl = shift.Employee != null ? shift.Employee.AvatarUrl : null,
+				EmployeeHasAvatar = shift.Employee != null && shift.Employee.AvatarImage != null && shift.Employee.AvatarImage.Length > 0,
+
+				// Option B: return endpoint path, NOT a stored url
+				EmployeeAvatarUrl = shift.EmployeeId != null ? $"/api/users/{shift.EmployeeId}/avatar" : null,
 				CreatedById = shift.CreatedById,
                 CreatedAt = shift.CreatedAt,
                 UpdatedById = shift.UpdatedById,
@@ -180,7 +189,10 @@ namespace Korvan_API.Controllers
                 EmployeeId = shift.EmployeeId,
                 EmployeeName = shift.Employee?.DisplayName,
 				EmployeeColorHex = shift.Employee != null ? shift.Employee.ProfileColorHex : null,
-				EmployeeAvatarUrl = shift.Employee != null ? shift.Employee.AvatarUrl : null,
+				EmployeeHasAvatar = shift.Employee != null && shift.Employee.AvatarImage != null && shift.Employee.AvatarImage.Length > 0,
+
+				// Option B: return endpoint path, NOT a stored url
+				EmployeeAvatarUrl = shift.EmployeeId != null ? $"/api/users/{shift.EmployeeId}/avatar" : null,
 				CreatedById = shift.CreatedById,
                 CreatedAt = shift.CreatedAt
             };

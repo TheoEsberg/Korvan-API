@@ -12,6 +12,6 @@
 
 		// New profile preferences
 		public string? ProfileColorHex { get; set; }
-		public string? AvatarUrl { get; set; }
+		public bool HasAvatar { get; set; }
 	}
 }

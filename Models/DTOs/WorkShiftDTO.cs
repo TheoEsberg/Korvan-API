@@ -16,8 +16,9 @@ namespace Korvan_API.Models.DTOs
 
         public string? EmployeeColorHex { get; set; }
         public string? EmployeeAvatarUrl { get; set; }
+		public bool EmployeeHasAvatar { get; set; }
 
-        public Guid CreatedById { get; set; }
+		public Guid CreatedById { get; set; }
         public DateTime CreatedAt { get; set; }
         public Guid? UpdatedById { get; set; }
         public DateTime? UpdatedAt { get; set; }

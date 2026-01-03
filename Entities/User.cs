@@ -14,7 +14,8 @@
 		public DateTime? RefreshTokenExpiryTime { get; set; }
 
 		public string? ProfileColorHex { get; set; } // Profile color as hex
-		public string? AvatarUrl { get; set; } // Profilepicture currently only URL based
+		public byte[]? AvatarImage { get; set; }          // bytea
+		public string? AvatarContentType { get; set; }    // "image/jpeg", "image/png"
 
 		public ICollection<WorkShift> AssignedShifts { get; set; } = new List<WorkShift>();
     }

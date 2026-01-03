@@ -3,6 +3,5 @@
 	public class UpdateProfilePreferencesDTO
 	{
 		public string? ProfileColorHex { get; set; }
-		public string? AvatarUrl { get; set; }
 	}
 }
