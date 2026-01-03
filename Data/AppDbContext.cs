@@ -11,8 +11,13 @@ namespace Korvan_API.Data
 		public DbSet<WorkShift> WorkShifts => Set<WorkShift>();
 		public DbSet<ShiftOffer> ShiftOffers => Set<ShiftOffer>();
 		public DbSet<Notification> Notifications => Set<Notification>();
+		public DbSet<ScheduleTemplate> ScheduleTemplates => Set<ScheduleTemplate>();
+		public DbSet<TemplateSlot> TemplateSlots => Set<TemplateSlot>();
+		public DbSet<TemplateDayPlan> TemplateDayPlans => Set<TemplateDayPlan>();
+		public DbSet<TemplateSlotPlan> TemplateSlotPlans => Set<TemplateSlotPlan>();
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
