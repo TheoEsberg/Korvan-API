@@ -27,15 +27,19 @@ namespace Korvan_API.Controllers
         public async Task<ActionResult<IEnumerable<ShiftOfferDTO>>> GetPendingOffers()
         {
             var offers = await _context.ShiftOffers
-                .Include(o => o.OfferedBy)
-                .Include(o => o.TakenById)
+				.AsNoTracking()
+				.Include(o => o.OfferedBy)
+                .Include(o => o.TakenBy)
                 .Where(o => o.Status == ShiftOfferStatus.Pending)
                 .OrderByDescending(o => o.CreatedAt)
                 .Select(o => new ShiftOfferDTO
                 {
                     Id = o.Id,
                     ShiftId = o.ShiftId,
-                    OfferedById = o.OfferedById,
+					ShiftDate = o.Shift.ShiftDate,
+					ShiftStartTime = o.Shift.StartTime,
+					ShiftEndTime = o.Shift.EndTime,
+					OfferedById = o.OfferedById,
                     OfferedByName = o.OfferedBy.DisplayName,
                     TakenById = o.TakenById,
                     TakenByName = o.TakenBy != null ? o.TakenBy.DisplayName : null,
@@ -57,7 +61,8 @@ namespace Korvan_API.Controllers
             var userId = User.GetUserId();
 
             var offers = await _context.ShiftOffers
-                .Include(o => o.OfferedBy)
+                .AsNoTracking()
+				.Include(o => o.OfferedBy)
                 .Include(o => o.TakenBy)
                 .Where(o => o.OfferedById == userId || o.TakenById == userId)
                 .OrderByDescending(o => o.CreatedAt)
@@ -65,7 +70,10 @@ namespace Korvan_API.Controllers
                 {
                     Id = o.Id,
                     ShiftId = o.ShiftId,
-                    OfferedById = o.OfferedById,
+					ShiftDate = o.Shift.ShiftDate,
+					ShiftStartTime = o.Shift.StartTime,
+					ShiftEndTime = o.Shift.EndTime,
+					OfferedById = o.OfferedById,
                     OfferedByName = o.OfferedBy.DisplayName,
                     TakenById = o.TakenById,
                     TakenByName = o.TakenBy != null ? o.TakenBy.DisplayName : null,
@@ -90,13 +98,19 @@ namespace Korvan_API.Controllers
             if (shift == null) return NotFound("Shift not found.");
 
             if (shift.EmployeeId != userId)
-                return Forbid("You can only offer your own shifts.");
+                return Problem("You can only offer your own shifts.", statusCode: 403);
 
-            if (shift.Status == ShiftStatus.Cancelled)
+
+			if (shift.Status == ShiftStatus.Cancelled)
                 return BadRequest("Cannot offer a cancelled shift.");
 
-            // Mark shift as offered
-            shift.Status = ShiftStatus.Offered;
+			var alreadyPending = await _context.ShiftOffers
+	            .AnyAsync(o => o.ShiftId == shiftId && o.Status == ShiftOfferStatus.Pending);
+
+			if (alreadyPending) return BadRequest("This shift already has a pending offer.");
+
+			// Mark shift as offered
+			shift.Status = ShiftStatus.Offered;
 
             var offer = new ShiftOffer
             {
@@ -110,22 +124,28 @@ namespace Korvan_API.Controllers
             _context.ShiftOffers.Add(offer);
             await _context.SaveChangesAsync();
 
-            await _context.Entry(offer).Reference(o => o.OfferedBy).LoadAsync();
+			await _context.Entry(offer).Reference(o => o.OfferedBy).LoadAsync();
+			await _context.Entry(offer).Reference(o => o.Shift).LoadAsync();
 
-            var dto = new ShiftOfferDTO
-            {
-                Id = offer.Id,
-                ShiftId = offer.ShiftId,
-                OfferedById = offer.OfferedById,
-                OfferedByName = offer.OfferedBy.DisplayName,
-                TakenById = offer.TakenById,
-                TakenByName = null,
-                Type = offer.Type,
-                Status = offer.Status,
-                CreatedAt = offer.CreatedAt
-            };
+			var dto = new ShiftOfferDTO
+			{
+				Id = offer.Id,
+				ShiftId = offer.ShiftId,
 
-            return Ok(dto);
+				ShiftDate = offer.Shift.ShiftDate,
+				ShiftStartTime = offer.Shift.StartTime,
+				ShiftEndTime = offer.Shift.EndTime,
+
+				OfferedById = offer.OfferedById,
+				OfferedByName = offer.OfferedBy.DisplayName,
+				TakenById = offer.TakenById,
+				TakenByName = null,
+				Type = offer.Type,
+				Status = offer.Status,
+				CreatedAt = offer.CreatedAt
+			};
+
+			return Ok(dto);
         }
 
         // POST: api/shiftoffers/{offerId}/accept
@@ -157,23 +177,28 @@ namespace Korvan_API.Controllers
 
             await _context.SaveChangesAsync();
 
-            await _context.Entry(offer).Reference(o => o.TakenBy).LoadAsync();
+			await _context.Entry(offer).Reference(o => o.OfferedBy).LoadAsync();
+			await _context.Entry(offer).Reference(o => o.Shift).LoadAsync();
 
-            var dto = new ShiftOfferDTO
-            {
-                Id = offer.Id,
-                ShiftId = offer.ShiftId,
-                OfferedById = offer.OfferedById,
-                OfferedByName = offer.OfferedBy.DisplayName,
-                TakenById = offer.TakenById,
-                TakenByName = offer.TakenBy?.DisplayName,
-                Type = offer.Type,
-                Status = offer.Status,
-                CreatedAt = offer.CreatedAt,
-                ResolvedAt = offer.ResolvedAt
-            };
+			var dto = new ShiftOfferDTO
+			{
+				Id = offer.Id,
+				ShiftId = offer.ShiftId,
 
-            return Ok(dto);
+				ShiftDate = offer.Shift.ShiftDate,
+				ShiftStartTime = offer.Shift.StartTime,
+				ShiftEndTime = offer.Shift.EndTime,
+
+				OfferedById = offer.OfferedById,
+				OfferedByName = offer.OfferedBy.DisplayName,
+				TakenById = offer.TakenById,
+				TakenByName = null,
+				Type = offer.Type,
+				Status = offer.Status,
+				CreatedAt = offer.CreatedAt
+			};
+
+			return Ok(dto);
         }
 
         // POST: api/shiftoffers/{offerId}/cancel

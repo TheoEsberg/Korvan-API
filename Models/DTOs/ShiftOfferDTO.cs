@@ -7,7 +7,11 @@ namespace Korvan_API.Models.DTOs
         public Guid Id { get; set; }
         public Guid ShiftId { get; set; }
 
-        public Guid OfferedById { get; set; }
+		public DateOnly ShiftDate { get; set; }
+		public TimeOnly ShiftStartTime { get; set; }
+		public TimeOnly ShiftEndTime { get; set; }
+
+		public Guid OfferedById { get; set; }
         public string OfferedByName { get; set; } = string.Empty;
 
         public Guid? TakenById { get; set; }
